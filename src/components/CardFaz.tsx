@@ -14,10 +14,12 @@ export default function CardFaz() {
   const [isAdm, setIsAdm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
   useEffect(() => {
     const carregarPedidos = async () => {
       setIsLoading(true)
       const dadosPedidos = await fetchPedidosPendenteFazer();
+      console.log(dadosPedidos);
       setPedidos(dadosPedidos);
       setIsLoading(false)
     };
@@ -117,7 +119,7 @@ export default function CardFaz() {
             )}
             {isAdm && (
               <View className="flex-row gap-3 mt-4 justify-center">
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => handleStatusUpdate(pedido.id, "concluido")}
                 >
                   <View className="bg-green-800 items-center flex-row justify-center rounded-lg p-5">
@@ -127,7 +129,7 @@ export default function CardFaz() {
                       color="white"
                     />
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity
                   onPress={() =>
                     handleOrderEdit(pedido.id, pedido.comanda_mesa)

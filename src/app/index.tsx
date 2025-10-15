@@ -11,7 +11,7 @@ export default function Index() {
   useEffect(() => {
     const checkAdm = async () => {
       try {
-        await AsyncStorage.setItem("adm", "true");
+        // await AsyncStorage.setItem("adm", "true");
         const adm = await AsyncStorage.getItem("adm");
         if (adm !== null) {
           setIsAdm(JSON.parse(adm));

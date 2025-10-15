@@ -36,7 +36,7 @@ export default function Pedido() {
         </TabsContent>
         <TabsContent value="buscarentrega">
           <Text className="text-xl font-bold text-center mb-4">
-            Pendente Buscar/Entrega
+            Concluídos
           </Text>
 
           <CardConcluido />

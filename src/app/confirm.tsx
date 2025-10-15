@@ -13,7 +13,6 @@ import RadioGroup from "react-native-radio-buttons-group";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Input } from "../components/Input";
 import Divider from "../components/Divider";
-import { Dropdown } from "react-native-element-dropdown";
 import supabase from "../utils/supabase";
 import * as Print from "expo-print";
 
@@ -42,15 +41,14 @@ type OrderDetails = {
   orderId: string;
   clientName: string;
   tableOrCommand: string;
-  payment: string;
   address?: Address;
   products: Product[];
+  totalWithFreight: number;
 };
 
 export default function Confirm() {
   const [products, setProducts] = useState<IProductProps[]>([]);
   const [selectedId, setSelectedId] = useState("1");
-  const [payment, setVPayment] = useState(null);
   const { total } = useLocalSearchParams();
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
@@ -93,11 +91,11 @@ export default function Confirm() {
 
   // Validação e envio do pedido
   const sendOrder = async () => {
-    // Valida os campos de mesa/comanda e forma de pagamento
-    if (!tableOrCommand || !payment) {
+    // Valida o campo de mesa/comanda (forma de pagamento removida da validação)
+    if (!tableOrCommand) {
       Alert.alert(
         "Erro",
-        "Por favor, preencha os campos de mesa/comanda e forma de pagamento."
+        "Por favor, preencha o campo de mesa/comanda."
       );
       return;
     }
@@ -157,7 +155,7 @@ export default function Confirm() {
 
       // Exibe a data ajustada
       console.log(data);
-      // Insere o pedido no Supabase
+      // Insere o pedido no Supabase (forma_pagamento removida)
       const adm = await AsyncStorage.getItem("adm");
       let id = await AsyncStorage.getItem('id_aparelho');
       const { data: orderData, error: orderError } = await supabase
@@ -166,8 +164,7 @@ export default function Confirm() {
           {
             data: data, // Data atual no formato ISO
             comanda_mesa: tableOrCommand, // Mesa ou comanda
-            forma_pagamento: payment, // Forma de pagamento
-            status: "pendente_fazer", // Status inicial do pedido
+            status: "pendente_fazer", // Status alterado para pendente_pagar
             id_endereco: addressId, // ID do endereço ou null
             total: totalWithFreight, // Valor total com ou sem frete
             nome_cliente: clientName,
@@ -218,7 +215,6 @@ export default function Confirm() {
           orderId,
           clientName,
           tableOrCommand,
-          payment,
           address: addressDetails,
           products,
           totalWithFreight,
@@ -234,7 +230,6 @@ export default function Confirm() {
     const {
       clientName,
       tableOrCommand,
-      payment,
       address,
       products,
       orderId,
@@ -267,7 +262,7 @@ export default function Confirm() {
                 <p style="margin: 2px 0;"><strong>Cliente:</strong> ${clientName}</p>
                 <p style="margin: 2px 0;"><strong>Comanda/Mesa:</strong> ${tableOrCommand}</p>
                 <p style="margin: 2px 0;"><strong>Obs:</strong> ${obs}</p>
-                <p style="margin: 2px 0;"><strong>Pagamento:</strong> ${payment}</p>
+                <p style="margin: 2px 0;"><strong>Pagamento:</strong> A definir</p>
                 
                 ${addressHTML}
                 <h3 style="font-size: 12px; margin: 10px 0 5px 0;">Itens do Pedido</h3>
@@ -311,13 +306,6 @@ export default function Confirm() {
     ],
     []
   );
-
-  const paymentOptions = [
-    { label: "Dinheiro", value: "Dinheiro" },
-    { label: "PIX", value: "PIX" },
-    { label: "Crédito", value: "Crédito" },
-    { label: "Débito", value: "Débito" },
-  ];
 
   const calculateTotalWithFreight = () => {
     const parsedFreight = parseFloat(freight.replace(",", "."));
@@ -414,23 +402,6 @@ export default function Confirm() {
               {`R$ ${calculateTotalWithFreight().toFixed(2)}`}
             </Text>
           </View>
-          <Text className="font-bold mt-5 text-lg">Forma de pagamento</Text>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={paymentOptions}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder="Selecione a forma de pagamento"
-            value={payment}
-            onChange={(item) => {
-              setVPayment(item.value);
-            }}
-          />
         </View>
         <TouchableOpacity disabled={products.length === 0} onPress={sendOrder}>
           <View className="bg-green-900 items-center flex-row justify-center rounded-lg p-1">

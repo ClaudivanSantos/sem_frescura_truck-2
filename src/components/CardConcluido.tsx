@@ -105,7 +105,7 @@ export default function CardConcluido() {
             )}
             {isAdm && (
               <View className="flex-row gap-3 mt-4 justify-center">
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => handleStatusUpdate(pedido.id, "concluido")}
                 >
                   <View className="bg-green-800 items-center flex-row justify-center rounded-lg p-5">
@@ -115,7 +115,7 @@ export default function CardConcluido() {
                       color="white"
                     />
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity
                   onPress={() =>
                     handleStatusUpdate(pedido.id, "pendente_fazer")

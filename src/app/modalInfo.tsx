@@ -85,7 +85,7 @@ export default function ModalScreen() {
               <IconContact link="https://claudivan.dev.br/pt" icon="chrome" />
             </View>
           </View>
-          <Text className="font-semibold text-lg">Versão: 1.5</Text>
+          <Text className="font-semibold text-lg">Versão: 2.0</Text>
         </View>
         <Image
           style={{ marginTop: 20 }}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import supabase from "../utils/supabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -96,6 +96,32 @@ export default function EditProduct() {
     setModalCreateVisible(false);
   }
 
+  const renderProductItem = ({ item }: { item: IProductProps }) => (
+    <View className="mb-4">
+      <View className="flex-row justify-between items-center">
+        <View className="flex-1">
+          <Text className="text-lg font-semibold">{item.nome}</Text>
+          <Text className="text-lg font-semibold">{`R$ ${item.preco.toFixed(2)}`}</Text>
+        </View>
+        <View className="flex-row gap-3">
+          <TouchableOpacity
+            onPress={() => handleClickEdit(item.id, item.nome, item.preco)}
+          >
+            <View className="bg-black items-center flex-row justify-center rounded-lg p-3">
+              <Ionicons name="pencil-outline" size={36} color="white" />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => deleteProduct(item.id)}>
+            <View className="bg-red-900 items-center flex-row justify-center rounded-lg p-3">
+              <Ionicons name="close-outline" size={36} color="white" />
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Divider />
+    </View>
+  );
+
   return (
     <View className="flex-1">
       <Header backIcon title="Editar produto" />
@@ -110,44 +136,26 @@ export default function EditProduct() {
         visible={modalEditVisible}
         onClose={onCloseModalEdit}
       />
-      <View className="p-4">
+      
+      <View className="flex-1 p-4">
         <TouchableOpacity onPress={() => setModalCreateVisible(true)}>
           <View className="bg-green-900 items-center flex-row justify-center rounded-lg p-5 mb-5">
             <Ionicons name="add-circle-outline" size={36} color="white" />
           </View>
         </TouchableOpacity>
 
-        <ScrollView>
-          {products?.map((item) => (
-            <View key={item.id}>
-              <View className="flex justify-between flex-row items-center text-center">
-                <View>
-                  <Text className="text-lg font-semibold">{item.nome}</Text>
-                  <Text className="text-lg font-semibold">{`R$ ${item.preco.toFixed(
-                    2
-                  )}`}</Text>
-                </View>
-                <View className="flex-row gap-3 mt-4 ">
-                  <TouchableOpacity
-                    onPress={() =>
-                      handleClickEdit(item.id, item.nome, item.preco)
-                    }
-                  >
-                    <View className="bg-black items-center flex-row justify-center rounded-lg p-3">
-                      <Ionicons name="pencil-outline" size={36} color="white" />
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => deleteProduct(item.id)}>
-                    <View className="bg-red-900 items-center flex-row justify-center rounded-lg p-3">
-                      <Ionicons name="close-outline" size={36} color="white" />
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <Divider />
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderProductItem}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          ListEmptyComponent={
+            <View className="items-center justify-center py-10">
+              <Text className="text-lg text-gray-500">Nenhum produto encontrado</Text>
             </View>
-          ))}
-        </ScrollView>
+          }
+        />
       </View>
     </View>
   );

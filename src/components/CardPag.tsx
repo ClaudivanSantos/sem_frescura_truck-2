@@ -1,4 +1,4 @@
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View, Alert, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { atualizarStatusPedido } from "../services/updatePedido";
 import { fetchPedidosPendentePagar } from "../services/getPendentePagar";
@@ -7,11 +7,14 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import Divider from "./Divider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingOverlay from "./loadingOverlay";
+import { Dropdown } from "react-native-element-dropdown";
 
 export default function CardPag() {
   const [pedidos, setPedidos] = useState([]);
   const [isAdm, setIsAdm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState({});
+
   useEffect(() => {
     setIsLoading(true)
     const carregarPedidos = async () => {
@@ -44,10 +47,23 @@ export default function CardPag() {
   }, []);
 
   const handleStatusUpdate = async (pedidoId: number, statusAtual: string) => {
-    await atualizarStatusPedido(pedidoId, statusAtual);
+    // Verifica se o status é "concluido" e se há forma de pagamento definida
+    if (statusAtual === "concluido" && !paymentMethod[pedidoId]) {
+      Alert.alert("Erro", "Por favor, selecione a forma de pagamento antes de concluir o pedido.");
+      return;
+    }
+
+    await atualizarStatusPedido(pedidoId, statusAtual, paymentMethod[pedidoId]);
     // Atualiza a lista de pedidos após a alteração do status
     const dadosPedidos = await fetchPedidosPendentePagar();
     setPedidos(dadosPedidos);
+  };
+
+  const handlePaymentMethodChange = (pedidoId: number, method: string) => {
+    setPaymentMethod(prev => ({
+      ...prev,
+      [pedidoId]: method
+    }));
   };
 
   useEffect(() => {
@@ -65,12 +81,19 @@ export default function CardPag() {
     checkAdm();
   }, []);
 
+  const paymentOptions = [
+    { label: "Dinheiro", value: "Dinheiro" },
+    { label: "PIX", value: "PIX" },
+    { label: "Crédito", value: "Crédito" },
+    { label: "Débito", value: "Débito" },
+  ];
+
   return (
     <View className="flex-1">
       <LoadingOverlay isLoading={isLoading} />
       <ScrollView>
         {pedidos.map((pedido) => (
-          <View key={pedido.id}>
+          <View key={pedido.id} className="p-4">
             <Text className="text-lg font-bold">
               Comanda/Mesa: {pedido.comanda_mesa}
             </Text>
@@ -102,6 +125,28 @@ export default function CardPag() {
                 </Text>
               </View>
             )}
+            
+            {/* Forma de Pagamento */}
+            <View className="mt-4">
+              <Text className="text-lg font-bold mb-2">Forma de Pagamento</Text>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                iconStyle={styles.iconStyle}
+                data={paymentOptions}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder="Selecione a forma de pagamento"
+                value={paymentMethod[pedido.id]}
+                onChange={(item) => {
+                  handlePaymentMethodChange(pedido.id, item.value);
+                }}
+              />
+            </View>
+            
             {isAdm && (
               <View className="flex-row gap-3 mt-4 justify-center">
                 <TouchableOpacity
@@ -144,3 +189,26 @@ export default function CardPag() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  dropdown: {
+    margin: 16,
+    height: 50,
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+});

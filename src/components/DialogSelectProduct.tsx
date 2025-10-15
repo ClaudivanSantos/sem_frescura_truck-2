@@ -125,59 +125,68 @@ const DialogSelectProduct: React.FC<DialogProps> = ({
         <View className="flex-1 justify-center items-center bg-black/50 h-[100%]">
           <TouchableWithoutFeedback>
             <View className="bg-white p-6 rounded-lg shadow-lg w-[90%] h-[80%]">
-              <Text className="text-xl font-semibold mb-4">
-                Adicionar produtos no carrinho
-              </Text>
-              <View className="flex-1">
-              <ScrollView>
-                {products?.map((item) => (
-                  <View key={item.id}>
-                    <View className="flex justify-between flex-row items-center text-center">
-                      <View>
-                        <Text className="text-2xl font-semibold">
-                          {item.nome}
-                        </Text>
-                        <Text className="text-2xl font-semibold">{`R$ ${item.preco.toFixed(
-                          2
-                        )}`}</Text>
-                      </View>
-                      <View className="flex-row gap-3 items-center justify-center">
-                        <TouchableOpacity
-                          onPress={() => decrementQuantity(item.id)}
-                        >
-                          <View className="bg-black items-center flex-row justify-center rounded-lg p-1">
-                            <Ionicons
-                              name="remove-outline"
-                              size={36}
-                              color="white"
-                            />
-                          </View>
-                        </TouchableOpacity>
-                        <Text className="text-2xl font-semibold">
-                          {quantities[item.id]}
-                        </Text>
-                        <TouchableOpacity
-                          onPress={() => incrementQuantity(item.id)}
-                        >
-                          <View className="bg-black items-center flex-row justify-center rounded-lg p-1">
-                            <Ionicons
-                              name="add-outline"
-                              size={36}
-                              color="white"
-                            />
-                          </View>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    <TouchableOpacity onPress={() => addToCart(item)}>
-                      <View className="bg-black items-center flex-row justify-center rounded-lg p-2 mt-4">
-                        <Ionicons name="cart-outline" size={36} color="white" />
-                      </View>
-                    </TouchableOpacity>
-                    <Divider />
+              {/* Cabeçalho com título e botão X */}
+              <View className="flex-row justify-between items-center mb-4">
+                <Text className="text-xl font-semibold">
+                  Adicionar produtos no carrinho
+                </Text>
+                <TouchableOpacity onPress={onClose}>
+                  <View className="bg-gray-200 rounded-full p-1">
+                    <Ionicons name="close" size={24} color="black" />
                   </View>
-                ))}
-              </ScrollView>
+                </TouchableOpacity>
+              </View>
+              
+              <View className="flex-1">
+                <ScrollView>
+                  {products?.map((item) => (
+                    <View key={item.id}>
+                      <View className="flex justify-between flex-row items-center text-center">
+                        <View>
+                          <Text className="text-2xl font-semibold">
+                            {item.nome}
+                          </Text>
+                          <Text className="text-2xl font-semibold">{`R$ ${item.preco.toFixed(
+                            2
+                          )}`}</Text>
+                        </View>
+                        <View className="flex-row gap-3 items-center justify-center">
+                          <TouchableOpacity
+                            onPress={() => decrementQuantity(item.id)}
+                          >
+                            <View className="bg-black items-center flex-row justify-center rounded-lg p-1">
+                              <Ionicons
+                                name="remove-outline"
+                                size={36}
+                                color="white"
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          <Text className="text-2xl font-semibold">
+                            {quantities[item.id]}
+                          </Text>
+                          <TouchableOpacity
+                            onPress={() => incrementQuantity(item.id)}
+                          >
+                            <View className="bg-black items-center flex-row justify-center rounded-lg p-1">
+                              <Ionicons
+                                name="add-outline"
+                                size={36}
+                                color="white"
+                              />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <TouchableOpacity onPress={() => addToCart(item)}>
+                        <View className="bg-black items-center flex-row justify-center rounded-lg p-2 mt-4">
+                          <Ionicons name="cart-outline" size={36} color="white" />
+                        </View>
+                      </TouchableOpacity>
+                      <Divider />
+                    </View>
+                  ))}
+                </ScrollView>
               </View>
             </View>
           </TouchableWithoutFeedback>
